@@ -33,4 +33,6 @@ cursor.execute("""
 """
 )
 
+
+
 connection.commit()
