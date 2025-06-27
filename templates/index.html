@@ -4,6 +4,9 @@
 
 {% block content %}
         <h1>All Stocks</h1>
+
+        <input type="text" id="searchInput" placeholder="Search stocks..." style="margin-bottom: 1em; padding: 0.5em; width: 100%; max-width: 400px;">
+
         <table class="ui celled table">
             <thead>
                 <tr>
@@ -11,7 +14,7 @@
                     <th>Company</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="stockTableBody">
                 {% for stock in stocks %}
                 <tr>
                     <td data-label="Symbol">{{ stock[2] }}</td>
@@ -20,5 +23,41 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <script>
+            const searchInput = document.getElementById("searchInput");
+            const tableBody = document.getElementById("stockTableBody");
+
+            searchInput.addEventListener("input", async () => {
+                const query = searchInput.value.trim();
+
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const stocks = await response.json();
+
+                // Clear table body
+                tableBody.innerHTML = "";
+
+                // Populate new rows
+                stocks.forEach(stock => {
+                    const row = document.createElement("tr");
+
+                    const symbolCell = document.createElement("td");
+                    symbolCell.setAttribute("data-label", "Symbol");
+                    symbolCell.textContent = stock.symbol;
+
+                    const companyCell = document.createElement("td");
+                    companyCell.setAttribute("data-label", "Company");
+                    const link = document.createElement("a");
+                    link.href = `/stock/${stock.symbol}`;
+                    link.textContent = stock.company;
+                    companyCell.appendChild(link);
+
+                    row.appendChild(symbolCell);
+                    row.appendChild(companyCell);
+
+                    tableBody.appendChild(row);
+                });
+            });
+        </script>
 
 {% endblock %}
