@@ -1,0 +1,24 @@
+
+        
+{% extends "layout.html" %}
+
+{% block content %}
+        <h1>All Stocks</h1>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Company</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td data-label="Symbol">{{ stock[2] }}</td>
+                    <td data-label="Company"><a href="/stock/{{stock[2]}}">{{ stock[1] }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+{% endblock %}

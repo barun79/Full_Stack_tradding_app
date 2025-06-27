@@ -1,6 +1,6 @@
 import sqlite3
 import alpaca_trade_api as tradeapi
-from secret_key import API_KEY, API_PASS
+from secret_key import API_KEY, SECRET_KEY
 import datetime
 
 # Set full paths if using cron
@@ -11,14 +11,16 @@ connection = sqlite3.connect(DB_PATH)
 cursor = connection.cursor()
 
 # Connect to Alpaca
-api = tradeapi.REST(API_KEY, API_PASS, base_url='https://paper-api.alpaca.markets')
+api = tradeapi.REST(API_KEY, SECRET_KEY, base_url='https://paper-api.alpaca.markets')
 assets = api.list_assets()
+
+allowed_exchanges = {"NASDAQ", "NYSE"}
 
 # --- STEP 1: Insert or update tradable stocks ---
 tradable_symbols = set()
 
 for asset in assets:
-    if asset.tradable:
+    if asset.tradable and asset.exchange in allowed_exchanges and asset.status == "active":
         tradable_symbols.add(asset.symbol)
         cursor.execute(
             "INSERT OR IGNORE INTO stock (symbol, company) VALUES (?, ?)",
